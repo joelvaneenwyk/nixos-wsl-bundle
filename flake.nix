@@ -2,7 +2,7 @@
   description = "NixOS WSL";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     flake-utils.url = "github:numtide/flake-utils";
 
     flake-compat = {
@@ -32,6 +32,12 @@
             wsl.enable = true;
             wsl.nativeSystemd = lib.mkIf legacy false;
             programs.bash.loginShellInit = "nixos-wsl-welcome";
+
+            # When the config is built from a flake, the NIX_PATH entry of nixpkgs is set to its flake version.
+            # Per default the resulting systems aren't flake-enabled, so rebuilds would fail.
+            # Note: This does not affect the module being imported into your own flake.
+            nixpkgs.flake.source = lib.mkForce null;
+
             systemd.tmpfiles.rules =
               let
                 channels = pkgs.runCommand "default-channels" { } ''
@@ -47,14 +53,16 @@
             system.stateVersion = config.system.nixos.release;
           };
         in
-        {
-          modern = nixpkgs.lib.nixosSystem {
+        rec {
+          default = nixpkgs.lib.nixosSystem {
             system = "x86_64-linux";
             modules = [
               self.nixosModules.default
               (config { })
             ];
           };
+
+          modern = nixpkgs.lib.warn "nixosConfigurations.modern has been renamed to nixosConfigurations.default" default;
 
           legacy = nixpkgs.lib.nixosSystem {
             system = "x86_64-linux";
