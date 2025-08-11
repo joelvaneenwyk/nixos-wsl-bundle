@@ -26,12 +26,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Tarball 📥
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: tarball
 
       - name: Download msix 📥
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: launcher-msix
 
@@ -39,7 +39,7 @@ jobs:
         run: mv */*.msixbundle NixOS-WSL-Launcher.msixbundle
 
       - name: Download bundle
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: launcher-bundle
           path: launcher-bundle
